@@ -40,7 +40,7 @@ def on_end():
 def intent_scheme(event):
     # change this intent name
     intent_name = event['request']['intent']['name']
-    if intent_name == "feedThePet":
+    if intent_name == "petsFed":
         return feed_the_pet(event)
     elif intent_name in ["AMAZON.NoIntent", "AMAZON.StopIntent", "AMAZON.CancelIntent"]:
         return stop_the_skill(event)
@@ -54,10 +54,7 @@ def intent_scheme(event):
 
 
 def feed_the_pet(event):
-    if(event is None):
-        pet_name = "Gary"
-    else:
-        pet_name = event['request']['intent']['slots']['pet']['value']
+    # pet_name = event['request']['intent']['slots']['pet']['value']
     if (is_fed):
         fed_MSG = "The pet has been fed"
     else:
@@ -66,7 +63,6 @@ def feed_the_pet(event):
     reprompt_MSG = "I'm sorry, I didn't understand you?"
     card_TEXT = "Feed the pet."
     card_TITLE = "Feed the pet."
-    print(pet_name)
     print(output_json_builder_with_reprompt_and_card(
         fed_MSG, card_TEXT, card_TITLE, reprompt_MSG, False))
     return output_json_builder_with_reprompt_and_card(fed_MSG, card_TEXT, card_TITLE, reprompt_MSG, False)
