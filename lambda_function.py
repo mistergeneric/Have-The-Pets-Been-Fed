@@ -84,8 +84,15 @@ def set_pet_fed(event):
     reprompt_MSG = "I'm sorry, has the pet been fed?"
     card_TEXT = "Feed the pet."
     card_TITLE = "Feed the pet."
-    table = dynamodb.Table('Pet')
-    response = table.query(KeyConditionExpression=Key('pet_id').eq('1'))
+    table = dynamodb.Table('User')
+    response = table.query(KeyConditionExpression=Key('user_id').eq(user_id))
+    print(response)
+    if(response['Items'] == []):
+        response = table.put_item(
+            Item={
+                'user_id': user_id
+            }
+        )
     print(response)
     print(output_json_builder_with_reprompt_and_card(
         fed_MSG, card_TEXT, card_TITLE, reprompt_MSG, False))
