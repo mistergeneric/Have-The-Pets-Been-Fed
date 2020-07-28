@@ -32,8 +32,11 @@ def on_start():
 
 
 def on_launch(event):
+    global user_id
     onlunch_MSG = "Hi, and welcome to have the pets been fed"
-    user_id = event['context']['System']['user']['userId']
+    user = event['context']['System']['user']
+    print(event['context']['System']['user'])
+    user_id = user['userId']
     reprompt_MSG = "Have the pets been fed?"
     card_TEXT = "Tell us whether the pets have been fed."
     card_TITLE = "Fed a pet."
@@ -79,12 +82,15 @@ def feed_the_pet(event):
 
 
 def set_pet_fed(event):
+    global is_fed
+    global user_id
     is_fed = True
     fed_MSG = "Thank you, we will remember that the pet has been fed"
     reprompt_MSG = "I'm sorry, has the pet been fed?"
     card_TEXT = "Feed the pet."
     card_TITLE = "Feed the pet."
     table = dynamodb.Table('User')
+    print('this is the user id ' + user_id)
     response = table.query(KeyConditionExpression=Key('user_id').eq(user_id))
     print(response)
     if(response['Items'] == []):
