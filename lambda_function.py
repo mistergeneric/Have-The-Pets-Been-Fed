@@ -1,9 +1,15 @@
 import json
+import boto3
+from boto3.dynamodb.conditions import Key, Attr
 
 # This code is based on a tutorial found at:
 # https://medium.com/datadriveninvestor/building-your-own-alexa-skill-from-scratch-2019-edition-957d776e22d5
 
 is_fed = False
+user_id = ''
+# make the connection to dynamodb
+dynamodb = boto3.resource('dynamodb')
+
 
 # main handler method
 
@@ -27,6 +33,7 @@ def on_start():
 
 def on_launch(event):
     onlunch_MSG = "Hi, and welcome to have the pets been fed"
+    user_id = event['context']['System']['user']['userId']
     reprompt_MSG = "Have the pets been fed?"
     card_TEXT = "Tell us whether the pets have been fed."
     card_TITLE = "Fed a pet."
@@ -38,10 +45,11 @@ def on_end():
 
 
 def intent_scheme(event):
-    # change this intent name
     intent_name = event['request']['intent']['name']
     if intent_name == "petsFed":
         return feed_the_pet(event)
+    elif intent_name == "set_pet_fed":
+        return set_pet_fed(event)
     elif intent_name in ["AMAZON.NoIntent", "AMAZON.StopIntent", "AMAZON.CancelIntent"]:
         return stop_the_skill(event)
     elif intent_name == "AMAZON.HelpIntent":
@@ -61,8 +69,8 @@ def feed_the_pet(event):
         fed_MSG = "The pet has not been fed"
 
     reprompt_MSG = "I'm sorry, I didn't understand you?"
-    card_TEXT = "Feed the pet."
-    card_TITLE = "Feed the pet."
+    card_TEXT = "Has the pet been fed."
+    card_TITLE = "Has the pet been fed."
     print(output_json_builder_with_reprompt_and_card(
         fed_MSG, card_TEXT, card_TITLE, reprompt_MSG, False))
     return output_json_builder_with_reprompt_and_card(fed_MSG, card_TEXT, card_TITLE, reprompt_MSG, False)
@@ -70,7 +78,18 @@ def feed_the_pet(event):
 # TODO - A method to save the pet name
 
 
-# TODO - A method to tell Alexa if the pet has been fed or not
+def set_pet_fed(event):
+    is_fed = True
+    fed_MSG = "Thank you, we will remember that the pet has been fed"
+    reprompt_MSG = "I'm sorry, has the pet been fed?"
+    card_TEXT = "Feed the pet."
+    card_TITLE = "Feed the pet."
+    table = dynamodb.Table('Pet')
+    response = table.query(KeyConditionExpression=Key('pet_id').eq('1'))
+    print(response)
+    print(output_json_builder_with_reprompt_and_card(
+        fed_MSG, card_TEXT, card_TITLE, reprompt_MSG, False))
+    return output_json_builder_with_reprompt_and_card(fed_MSG, card_TEXT, card_TITLE, reprompt_MSG, False)
 
 
 def stop_the_skill(event):
